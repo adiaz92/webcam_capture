@@ -1,4 +1,3 @@
-
 //opencv
 #include "opencv2/opencv.hpp"
 
@@ -6,15 +5,38 @@
 #include <iostream>
 #include <cstdlib>
 
+//
+
 //main
 int main(int argc, char *argv[])
 {
     cv::VideoCapture camera; //OpenCV video capture object
     cv::Mat image; //OpenCV image object
-	int cam_id; //camera id . Associated to device number in /dev/videoX
-	cv::Scalar_<unsigned char> px_value; //pixel value (4-element vector)
-	int user_key; //user pressed key to quit
+	  int cam_id; //camera id . Associated to device number in /dev/videoX
+	  cv::Scalar_<unsigned char> px_value; //pixel value (4-element vector)
+	  int user_key; //user pressed key to quit
 
+
+
+    void paint_center(cv::Mat & image)
+    {
+            const int y = image.rows/2;
+            const int x = image.cols/2;
+
+       for(int j = 0; j < image.rows/2; j++)
+       {
+           for(int i = 0; i < image.cols/2; i++)
+           {
+            cv::Vec3b intensity = image.at<cv::Vec3b>(y+j, x+i);
+
+                    intensity[1] = 0;
+                    intensity[2] = 0;
+                    intensity[3] = 255;
+
+         }
+         image.at<cv::Vec3b>(y+j, x+i) = intensity;
+       }
+     }
 	//check user args
 	switch(argc)
 	{
@@ -45,15 +67,19 @@ int main(int argc, char *argv[])
 	{
 		//Read image and check it. Blocking call up to a new image arrives from camera.
         if(!camera.read(image))
-		{
+		   {
             std::cout << "No frame" << std::endl;
+            paint_center(image);
             cv::waitKey();
+
         }
+}
+
 
         //show image in a window
         cv::imshow("Output Window", image);
 
 		//Waits 30 millisecond to check if 'q' key has been pressed. If so, breaks the loop. Otherwise continues.
-    	if( (unsigned char)(cv::waitKey(30) & 0xff) == 'q' ) break; 
+    	if( (unsigned char)(cv::waitKey(30) & 0xff) == 'q' ) break;
     }
 }
